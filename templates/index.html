@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .scroll-container {
+      height: 400px; /* Set the desired height for the scrollable container */
+    }
+    .scroll-container pre {
+      overflow-y: scroll;
+      white-space: pre-wrap;
+      overflow-wrap: break-word; /* Update this line */
+    }
+  </style>
+  <script>
+    function copyToClipboard() {
+      const textarea = document.getElementById('api_end');
+      textarea.select();
+      document.execCommand('copy');
+      alert('Copied to clipboard!');
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      body.classList.toggle('dark');
+    }
+  </script>
+</head>
+<body class="transition-colors duration-500">
+  <div class="container mx-auto py-10">
+    <h1 class="text-4xl font-bold">API Documentation to LLM JSON Converter</h1>
+    <div class="flex justify-end items-center mb-4 mt-2">
+      <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="toggleTheme()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+          <path d="M12 2a10 10 0 00-7.64 15.9A1 1 0 004.9 19H6.1a8 8 0 010 2H3a1 1 0 00-.9 1.45l1.6 3.2a1 1 0 00.9.55h14.8a1 1 0 00.9-.55l1.6-3.2a1 1 0 00-.9-1.45h-2.1a8 8 0 010-2h1.2a1 1 0 00.74-1.66A10 10 0 0012 2zM8 9a4 4 0 100 8 4 4 0 000-8zm8 0a4 4 0 100 8 4 4 0 000-8z"/>
+        </svg>
+      </button>
+    </div>
+    <form action="/convert" method="POST" class="mt-8">
+      <div class="flex flex-col mb-4">
+        <label for="api_doc" class="text-lg font-semibold mb-2">Paste the API Documentation:</label>
+        <textarea name="api_doc" id="api_doc" rows="10" class="border border-gray-300 rounded p-2"></textarea>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Convert
+        </button>
+      </div>
+    </form>
+    {% if response %}
+    <div class="container mx-auto py-10">
+
+      <div class="flex flex-col mb-4">
+        <label for="api_end" class="text-lg font-semibold mb-2">LLM Training JSON Output:</label>
+        <textarea name="api_end" id="api_end" rows="10" class="border border-gray-300 rounded p-2">{{ response | tojson }}</textarea>
+      </div>
+      <div class="flex justify-end space-x-4">
+        <button type="button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" onclick="copyToClipboard()">
+          Copy to Clipboard
+        </button>
+        <form action="/download" method="POST">
+          <input type="hidden" name="data" value="{{ response | tojson }}">
+          <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Save as JSON
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
